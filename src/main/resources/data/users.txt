@@ -3,4 +3,3 @@ U-CUST-1|CUSTOMER|John Doe|customer@hall.com|cust123|ACTIVE|0123456789|123 Main 
 U-ADMIN-1|ADMIN|Admin|admin@hall.com|admin123|ACTIVE|S-ADMIN-1|ADMIN|2026-03-13
 U-SCHED-1|SCHEDULER|Scheduler|scheduler@hall.com|sched123|ACTIVE|S-SCHED-1|SCHEDULER|2026-03-13
 U-MGR-1|MANAGER|Manager|manager@hall.com|mgr123|ACTIVE|S-MGR-1|MANAGER|2026-03-13
-U-e91d5bd6-3150-4898-a5be-34adb63e5eed|CUSTOMER|Dikshit Phuyal|dikshitphuyal550@gmail.com|123456|ACTIVE|9818141012|kathmandu|2026-03-13

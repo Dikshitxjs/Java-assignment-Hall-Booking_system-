@@ -152,4 +152,20 @@ public class BookingService {
         LocalDate today = LocalDate.now();
         return !date.isBefore(today) && !date.isAfter(today.plusYears(1));
     }
+
+    public void updateBooking(Booking booking) {
+        try {
+            List<String> lines = FileHandler.readFromFile(BOOKING_FILE);
+            for (int i = 0; i < lines.size(); i++) {
+                Optional<Booking> opt = parseBooking(lines.get(i));
+                if (opt.isPresent() && opt.get().getBookingId().equals(booking.getBookingId())) {
+                    lines.set(i, bookingToLine(booking));
+                    FileHandler.writeToFile(BOOKING_FILE, lines);
+                    return;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

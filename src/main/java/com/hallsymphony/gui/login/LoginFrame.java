@@ -38,31 +38,110 @@ public class LoginFrame extends JFrame {
         this.issueService = new IssueService();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setSize(420, 260);
+        setSize(500, 550);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout());
+        getContentPane().setBackground(new Color(240, 240, 240));
 
-        JPanel form = new JPanel(new GridLayout(3, 2, 8, 8));
-        form.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
+        // Main panel
+        JPanel mainPanel = new JPanel();
+        mainPanel.setBackground(new Color(240, 240, 240));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
 
-        form.add(new JLabel("Email:"));
+        // Title
+        JLabel titleLabel = new JLabel("Hall Symphony");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mainPanel.add(titleLabel);
+
+        mainPanel.add(Box.createVerticalStrut(10));
+
+        // Subtitle
+        JLabel subtitleLabel = new JLabel("Login to your account");
+        subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        subtitleLabel.setForeground(new Color(100, 100, 100));
+        subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mainPanel.add(subtitleLabel);
+
+        mainPanel.add(Box.createVerticalStrut(30));
+
+        // Form panel with white background
+        JPanel formPanel = new JPanel();
+        formPanel.setBackground(Color.WHITE);
+        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+
+        // Email
+        JLabel emailLabel = new JLabel("Email");
+        emailLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        emailLabel.setForeground(new Color(50, 50, 50));
+        formPanel.add(emailLabel);
+        formPanel.add(Box.createVerticalStrut(8));
         emailField = new JTextField();
-        form.add(emailField);
+        emailField.setFont(new Font("Arial", Font.PLAIN, 13));
+        emailField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        emailField.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        formPanel.add(emailField);
+        formPanel.add(Box.createVerticalStrut(20));
 
-        form.add(new JLabel("Password:"));
+        // Password
+        JLabel passwordLabel = new JLabel("Password");
+        passwordLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        passwordLabel.setForeground(new Color(50, 50, 50));
+        formPanel.add(passwordLabel);
+        formPanel.add(Box.createVerticalStrut(8));
         passwordField = new JPasswordField();
-        form.add(passwordField);
+        passwordField.setFont(new Font("Arial", Font.PLAIN, 13));
+        passwordField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        passwordField.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        formPanel.add(passwordField);
+        formPanel.add(Box.createVerticalStrut(30));
 
-        JButton loginBtn = new JButton("Login");
+        // Login Button
+        JButton loginBtn = new JButton("Sign In");
+        loginBtn.setFont(new Font("Arial", Font.BOLD, 14));
+        loginBtn.setBackground(new Color(52, 152, 219));
+        loginBtn.setForeground(Color.WHITE);
+        loginBtn.setBorder(BorderFactory.createEmptyBorder());
+        loginBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        loginBtn.setFocusPainted(false);
+        loginBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         loginBtn.addActionListener(this::handleLogin);
-        form.add(loginBtn);
+        formPanel.add(loginBtn);
 
+        formPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 350));
+        mainPanel.add(formPanel);
+
+        mainPanel.add(Box.createVerticalStrut(20));
+
+        // New User Registration Link
+        JButton registerLinkBtn = new JButton("New User? Register here");
+        registerLinkBtn.setFont(new Font("Arial", Font.PLAIN, 11));
+        registerLinkBtn.setBackground(new Color(230, 230, 230));
+        registerLinkBtn.setForeground(new Color(52, 152, 219));
+        registerLinkBtn.setBorder(BorderFactory.createEmptyBorder());
+        registerLinkBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        registerLinkBtn.setFocusPainted(false);
+        registerLinkBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        registerLinkBtn.addActionListener(e -> openRegistration());
+        mainPanel.add(registerLinkBtn);
+
+        mainPanel.add(Box.createVerticalStrut(10));
+
+        // Exit Button
         JButton exitBtn = new JButton("Exit");
+        exitBtn.setFont(new Font("Arial", Font.PLAIN, 12));
+        exitBtn.setBackground(new Color(230, 230, 230));
+        exitBtn.setForeground(new Color(80, 80, 80));
+        exitBtn.setBorder(BorderFactory.createEmptyBorder());
+        exitBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        exitBtn.setFocusPainted(false);
+        exitBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         exitBtn.addActionListener(e -> System.exit(0));
-        form.add(exitBtn);
+        mainPanel.add(exitBtn);
 
-        add(new JLabel("Welcome to Hall Symphony", SwingConstants.CENTER), BorderLayout.NORTH);
-        add(form, BorderLayout.CENTER);
+        add(mainPanel, BorderLayout.CENTER);
     }
 
     private void handleLogin(ActionEvent event) {
@@ -97,6 +176,11 @@ public class LoginFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "User role not supported.", "Error", JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
+    }
+
+    private void openRegistration() {
+        com.hallsymphony.gui.customer.RegistrationFrame.run();
+        dispose();
     }
 
     public static void run() {

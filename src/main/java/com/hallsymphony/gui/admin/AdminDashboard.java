@@ -36,6 +36,12 @@ public class AdminDashboard extends JFrame {
         JButton blockButton = new JButton("Block Selected User");
         blockButton.addActionListener(e -> blockSelectedUser(userTable));
 
+        JButton staffBtn = new JButton("Manage Staff");
+        staffBtn.addActionListener(e -> new StaffManagementFrame().setVisible(true));
+
+        JButton bookingsBtn = new JButton("View All Bookings");
+        bookingsBtn.addActionListener(e -> new BookingOverviewFrame().setVisible(true));
+
         JButton logoutButton = new JButton("Logout");
         logoutButton.addActionListener(e -> {
             dispose();
@@ -45,6 +51,8 @@ public class AdminDashboard extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         buttonPanel.add(refreshButton);
         buttonPanel.add(blockButton);
+        buttonPanel.add(staffBtn);
+        buttonPanel.add(bookingsBtn);
         buttonPanel.add(logoutButton);
 
         add(new JLabel("Admin Dashboard", SwingConstants.CENTER), BorderLayout.NORTH);

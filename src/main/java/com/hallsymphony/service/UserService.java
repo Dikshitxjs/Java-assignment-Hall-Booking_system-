@@ -249,4 +249,87 @@ public class UserService {
             e.printStackTrace();
         }
     }
+
+    public boolean isEmailExists(String email) {
+        List<User> allUsers = getAllUsers();
+        for (User user : allUsers) {
+            if (user.getEmail().equalsIgnoreCase(email)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void updateCustomerProfile(Customer customer) {
+        try {
+            List<String> lines = FileHandler.readFromFile(USER_FILE);
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                Optional<User> opt = parseUser(line);
+                if (opt.isPresent() && opt.get().getUserId().equals(customer.getUserId())) {
+                    lines.set(i, userToLine(customer));
+                    FileHandler.writeToFile(USER_FILE, lines);
+                    return;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Scheduler> getAllSchedulers() {
+        List<Scheduler> schedulers = new ArrayList<>();
+        for (User user : getAllUsers()) {
+            if (user instanceof Scheduler) {
+                schedulers.add((Scheduler) user);
+            }
+        }
+        return schedulers;
+    }
+
+    public void addScheduler(Scheduler scheduler) {
+        appendUser(scheduler);
+    }
+
+    public void updateScheduler(Scheduler scheduler) {
+        try {
+            List<String> lines = FileHandler.readFromFile(USER_FILE);
+            for (int i = 0; i < lines.size(); i++) {
+                Optional<User> opt = parseUser(lines.get(i));
+                if (opt.isPresent() && opt.get().getUserId().equals(scheduler.getUserId())) {
+                    lines.set(i, userToLine(scheduler));
+                    FileHandler.writeToFile(USER_FILE, lines);
+                    return;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteScheduler(String staffId) {
+        try {
+            List<String> lines = FileHandler.readFromFile(USER_FILE);
+            for (int i = 0; i < lines.size(); i++) {
+                Optional<User> opt = parseUser(lines.get(i));
+                if (opt.isPresent() && opt.get().getUserId().equals(staffId) && opt.get() instanceof Scheduler) {
+                    lines.remove(i);
+                    FileHandler.writeToFile(USER_FILE, lines);
+                    return;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Customer findCustomerByEmail(String email) {
+        List<User> allUsers = getAllUsers();
+        for (User user : allUsers) {
+            if (user instanceof Customer && user.getEmail().equalsIgnoreCase(email)) {
+                return (Customer) user;
+            }
+        }
+        return null;
+    }
 }

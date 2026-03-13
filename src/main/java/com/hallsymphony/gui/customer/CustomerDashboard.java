@@ -111,7 +111,13 @@ public class CustomerDashboard extends JFrame {
             new com.hallsymphony.gui.login.LoginFrame().run();
         });
 
+        JButton profileBtn = new JButton("Update Profile");
+        profileBtn.addActionListener(e -> {
+            new ProfileFrame(customer).setVisible(true);
+        });
+
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        bottom.add(profileBtn);
         bottom.add(logout);
 
         add(tabs, BorderLayout.CENTER);

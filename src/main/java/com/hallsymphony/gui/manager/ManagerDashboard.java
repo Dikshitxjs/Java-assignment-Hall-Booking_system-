@@ -37,15 +37,29 @@ public class ManagerDashboard extends JFrame {
 
         // Sales tab
         JPanel salesPanel = new JPanel(new BorderLayout(10, 10));
+        salesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        JLabel periodLabel = new JLabel("Filter by Period:");
+        JComboBox<String> periodCombo = new JComboBox<>(new String[]{"This Week", "This Month", "This Year", "All Time"});
+        filterPanel.add(periodLabel);
+        filterPanel.add(periodCombo);
+
         JLabel salesLabel = new JLabel("Total Sales: RM 0.00", SwingConstants.CENTER);
+        salesLabel.setFont(new Font("Arial", Font.BOLD, 18));
+
         JButton refreshSales = new JButton("Refresh");
-        refreshSales.addActionListener(e -> refreshSalesAmount(salesLabel));
+        refreshSales.addActionListener(e -> updateSalesLabel(salesLabel, periodCombo.getSelectedItem().toString()));
+
+        periodCombo.addActionListener(e -> updateSalesLabel(salesLabel, periodCombo.getSelectedItem().toString()));
+
+        salesPanel.add(filterPanel, BorderLayout.NORTH);
         salesPanel.add(salesLabel, BorderLayout.CENTER);
         salesPanel.add(refreshSales, BorderLayout.SOUTH);
         tabs.addTab("Sales", salesPanel);
 
         // Issues tab
-        issueModel = new DefaultTableModel(new String[]{"Issue ID", "Booking ID", "Description", "Status"}, 0);
+        issueModel = new DefaultTableModel(new String[]{"Issue ID", "Booking ID", "Description", "Status", "Assigned To"}, 0);
         JTable issueTable = new JTable(issueModel);
         JScrollPane issueScroll = new JScrollPane(issueTable);
         JButton refreshIssues = new JButton("Refresh");
@@ -80,11 +94,25 @@ public class ManagerDashboard extends JFrame {
         label.setText(String.format("Total Sales: RM %.2f", total));
     }
 
+    private void updateSalesLabel(JLabel label, String period) {
+        double total = 0;
+        if (period.equals("This Week")) {
+            total = paymentService.getTotalSalesThisWeek();
+        } else if (period.equals("This Month")) {
+            total = paymentService.getTotalSalesThisMonth();
+        } else if (period.equals("This Year")) {
+            total = paymentService.getTotalSalesThisYear();
+        } else {
+            total = paymentService.getTotalSalesAllTime();
+        }
+        label.setText(String.format("Total Sales (%s): RM %.2f", period, total));
+    }
+
     private void refreshIssues() {
         List<Issue> issues = issueService.getAllIssues();
         issueModel.setRowCount(0);
         for (Issue i : issues) {
-            issueModel.addRow(new Object[]{i.getIssueId(), i.getBookingId(), i.getDescription(), i.getIssueStatus()});
+            issueModel.addRow(new Object[]{i.getIssueId(), i.getBookingId(), i.getDescription(), i.getIssueStatus(), "Unassigned"});
         }
     }
 

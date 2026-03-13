@@ -39,7 +39,7 @@ public class AdminDashboard extends JFrame {
         JButton logoutButton = new JButton("Logout");
         logoutButton.addActionListener(e -> {
             dispose();
-            new com.hallsymphony.gui.login.LoginFrame().run();
+            com.hallsymphony.gui.login.LoginFrame.run();
         });
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));

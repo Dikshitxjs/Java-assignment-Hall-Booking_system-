@@ -27,15 +27,23 @@ public class BookingService {
                 Files.createDirectories(BOOKING_FILE.getParent());
             }
             if (Files.notExists(BOOKING_FILE)) {
-                Files.write(BOOKING_FILE, List.of("# Booking data file"));
+                Files.write(BOOKING_FILE, java.util.Collections.singletonList("# Booking data file"));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private List<String> readLines() throws IOException {
+        return FileHandler.readFromFile(BOOKING_FILE);
+    }
+
+    private void writeLines(List<String> lines) throws IOException {
+        FileHandler.writeToFile(BOOKING_FILE, lines);
+    }
+
     private Optional<Booking> parseBooking(String line) {
-        if (line == null || line.isBlank() || line.startsWith("#")) {
+        if (line == null || line.trim().isEmpty() || line.startsWith("#")) {
             return Optional.empty();
         }
         String[] parts = line.split("\\|");
@@ -70,9 +78,9 @@ public class BookingService {
             if (!isHallAvailable(booking.getHallId(), booking.getBookingDate(), booking.getStartTime(), booking.getEndTime())) {
                 return null;
             }
-            List<String> lines = FileHandler.readFromFile(BOOKING_FILE);
+            List<String> lines = readLines();
             lines.add(bookingToLine(booking));
-            FileHandler.writeToFile(BOOKING_FILE, lines);
+            writeLines(lines);
             return booking;
         } catch (IOException e) {
             e.printStackTrace();
@@ -82,7 +90,7 @@ public class BookingService {
 
     public boolean cancelBooking(String bookingId) {
         try {
-            List<String> lines = FileHandler.readFromFile(BOOKING_FILE);
+            List<String> lines = readLines();
             for (int i = 0; i < lines.size(); i++) {
                 Optional<Booking> opt = parseBooking(lines.get(i));
                 if (opt.isPresent() && opt.get().getBookingId().equals(bookingId)) {
@@ -92,7 +100,7 @@ public class BookingService {
                     }
                     booking.cancelBooking();
                     lines.set(i, bookingToLine(booking));
-                    FileHandler.writeToFile(BOOKING_FILE, lines);
+                    writeLines(lines);
                     return true;
                 }
             }
@@ -121,7 +129,7 @@ public class BookingService {
     public List<Booking> getBookingsForCustomer(String customerId) {
         List<Booking> bookings = new ArrayList<>();
         try {
-            List<String> lines = FileHandler.readFromFile(BOOKING_FILE);
+            List<String> lines = readLines();
             for (String line : lines) {
                 Optional<Booking> opt = parseBooking(line);
                 if (opt.isPresent() && opt.get().getCustomerId().equals(customerId)) {
@@ -137,7 +145,7 @@ public class BookingService {
     public List<Booking> getAllBookings() {
         List<Booking> bookings = new ArrayList<>();
         try {
-            List<String> lines = FileHandler.readFromFile(BOOKING_FILE);
+            List<String> lines = readLines();
             for (String line : lines) {
                 parseBooking(line).ifPresent(bookings::add);
             }

@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,11 +28,11 @@ public class HallService {
                 Files.createDirectories(HALL_FILE.getParent());
             }
             if (Files.notExists(HALL_FILE)) {
-                Files.write(HALL_FILE, List.of("# Hall data file"));
+                Files.write(HALL_FILE, Collections.singletonList("# Hall data file"));
             }
 
             List<String> lines = FileHandler.readFromFile(HALL_FILE);
-            long dataLines = lines.stream().filter(l -> l != null && !l.isBlank() && !l.startsWith("#")).count();
+            long dataLines = lines.stream().filter(l -> l != null && !l.trim().isEmpty() && !l.startsWith("#")).count();
             if (dataLines == 0) {
                 addHall(new Auditorium("H-AUD-1", "Auditorium 1", 1000, 300.0, "AVAILABLE"));
                 addHall(new BanquetHall("H-BAN-1", "Banquet Hall 1", 300, 100.0, "AVAILABLE"));
@@ -43,7 +44,7 @@ public class HallService {
     }
 
     private Optional<Hall> parseHall(String line) {
-        if (line == null || line.isBlank() || line.startsWith("#")) {
+        if (line == null || line.trim().isEmpty() || line.startsWith("#")) {
             return Optional.empty();
         }
         String[] parts = line.split("\\|");

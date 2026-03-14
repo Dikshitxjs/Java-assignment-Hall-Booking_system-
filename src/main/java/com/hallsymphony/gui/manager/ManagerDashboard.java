@@ -124,7 +124,7 @@ public class ManagerDashboard extends JFrame {
         }
         String issueId = (String) issueModel.getValueAt(row, 0);
         String status = JOptionPane.showInputDialog(this, "New status (IN_PROGRESS/DONE/CLOSED/CANCELLED):", "Update Status", JOptionPane.PLAIN_MESSAGE);
-        if (status == null || status.isBlank()) {
+        if (status == null || status.trim().isEmpty()) {
             return;
         }
         try {

@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,12 +31,12 @@ public class UserService {
             }
 
             if (Files.notExists(USER_FILE)) {
-                Files.write(USER_FILE, List.of("# User data file"));
+                Files.write(USER_FILE, Collections.singletonList("# User data file"));
             }
 
             // Ensure at least one user of each role exists for easy login
-            List<String> lines = FileHandler.readFromFile(USER_FILE);
-            long dataLines = lines.stream().filter(l -> l != null && !l.isBlank() && !l.startsWith("#")).count();
+            List<String> lines = readLines();
+            long dataLines = lines.stream().filter(l -> l != null && !l.trim().isEmpty() && !l.startsWith("#")).count();
             if (dataLines == 0) {
                 registerCustomer(new Customer("U-CUST-1", "John Doe", "customer@hall.com", "cust123", "ACTIVE",
                         "0123456789", "123 Main St", LocalDate.now()));
@@ -51,8 +52,16 @@ public class UserService {
         }
     }
 
+    private List<String> readLines() throws IOException {
+        return FileHandler.readFromFile(USER_FILE);
+    }
+
+    private void writeLines(List<String> lines) throws IOException {
+        FileHandler.writeToFile(USER_FILE, lines);
+    }
+
     private Optional<User> parseUser(String line) {
-        if (line == null || line.isBlank() || line.startsWith("#")) {
+        if (line == null || line.trim().isEmpty() || line.startsWith("#")) {
             return Optional.empty();
         }
 
@@ -197,51 +206,32 @@ public class UserService {
     }
 
     public void registerCustomer(Customer customer) {
-        customer = new Customer(
-                customer.getUserId(),
-                customer.getFullName(),
-                customer.getEmail(),
-                customer.getPassword(),
-                customer.getStatus(),
-                customer.getPhoneNumber(),
-                customer.getAddress(),
-                customer.getRegistrationDate() == null ? LocalDate.now() : customer.getRegistrationDate()
-        );
+        // Ensure registration date is always set when we persist the user
+        if (customer.getRegistrationDate() == null) {
+            customer = new Customer(
+                    customer.getUserId(),
+                    customer.getFullName(),
+                    customer.getEmail(),
+                    customer.getPassword(),
+                    customer.getStatus(),
+                    customer.getPhoneNumber(),
+                    customer.getAddress(),
+                    LocalDate.now());
+        }
         appendUser(customer);
     }
 
     public void blockUser(String userId) {
         try {
-            List<String> lines = FileHandler.readFromFile(USER_FILE);
+            List<String> lines = readLines();
             for (int i = 0; i < lines.size(); i++) {
                 String line = lines.get(i);
                 Optional<User> opt = parseUser(line);
                 if (opt.isPresent() && opt.get().getUserId().equals(userId)) {
                     User user = opt.get();
-                    // Create a new instance with blocked status while preserving user type
-                    User blockedUser;
-                    if (user instanceof Customer) {
-                        Customer c = (Customer) user;
-                        blockedUser = new Customer(c.getUserId(), c.getFullName(), c.getEmail(), c.getPassword(), "BLOCKED",
-                                c.getPhoneNumber(), c.getAddress(), c.getRegistrationDate());
-                    } else if (user instanceof Administrator) {
-                        Administrator a = (Administrator) user;
-                        blockedUser = new Administrator(a.getUserId(), a.getFullName(), a.getEmail(), a.getPassword(), "BLOCKED",
-                                a.getStaffId(), a.getRole(), a.getJoinedDate());
-                    } else if (user instanceof Scheduler) {
-                        Scheduler s = (Scheduler) user;
-                        blockedUser = new Scheduler(s.getUserId(), s.getFullName(), s.getEmail(), s.getPassword(), "BLOCKED",
-                                s.getStaffId(), s.getRole(), s.getJoinedDate());
-                    } else if (user instanceof Manager) {
-                        Manager m = (Manager) user;
-                        blockedUser = new Manager(m.getUserId(), m.getFullName(), m.getEmail(), m.getPassword(), "BLOCKED",
-                                m.getStaffId(), m.getRole(), m.getJoinedDate());
-                    } else {
-                        blockedUser = user;
-                        blockedUser.setStatus("BLOCKED");
-                    }
-                    lines.set(i, userToLine(blockedUser));
-                    FileHandler.writeToFile(USER_FILE, lines);
+                    user.setStatus("BLOCKED");
+                    lines.set(i, userToLine(user));
+                    writeLines(lines);
                     return;
                 }
             }

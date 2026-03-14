@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,15 +27,23 @@ public class IssueService {
                 Files.createDirectories(ISSUE_FILE.getParent());
             }
             if (Files.notExists(ISSUE_FILE)) {
-                Files.write(ISSUE_FILE, List.of("# Issue data file"));
+                Files.write(ISSUE_FILE, Collections.singletonList("# Issue data file"));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private List<String> readLines() throws IOException {
+        return FileHandler.readFromFile(ISSUE_FILE);
+    }
+
+    private void writeLines(List<String> lines) throws IOException {
+        FileHandler.writeToFile(ISSUE_FILE, lines);
+    }
+
     private Optional<Issue> parseIssue(String line) {
-        if (line == null || line.isBlank() || line.startsWith("#")) {
+        if (line == null || line.trim().isEmpty() || line.startsWith("#")) {
             return Optional.empty();
         }
         String[] parts = line.split("\\|");
@@ -60,9 +69,9 @@ public class IssueService {
 
     public void raiseIssue(Issue issue) {
         try {
-            List<String> lines = FileHandler.readFromFile(ISSUE_FILE);
+            List<String> lines = readLines();
             lines.add(issueToLine(issue));
-            FileHandler.writeToFile(ISSUE_FILE, lines);
+            writeLines(lines);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -71,7 +80,7 @@ public class IssueService {
     public List<Issue> getAllIssues() {
         List<Issue> issues = new ArrayList<>();
         try {
-            List<String> lines = FileHandler.readFromFile(ISSUE_FILE);
+            List<String> lines = readLines();
             for (String line : lines) {
                 parseIssue(line).ifPresent(issues::add);
             }
@@ -83,14 +92,14 @@ public class IssueService {
 
     public void updateIssueStatus(String issueId, IssueStatus status) {
         try {
-            List<String> lines = FileHandler.readFromFile(ISSUE_FILE);
+            List<String> lines = readLines();
             for (int i = 0; i < lines.size(); i++) {
                 Optional<Issue> opt = parseIssue(lines.get(i));
                 if (opt.isPresent() && opt.get().getIssueId().equals(issueId)) {
                     Issue issue = opt.get();
                     issue.updateStatus(status);
                     lines.set(i, issueToLine(issue));
-                    FileHandler.writeToFile(ISSUE_FILE, lines);
+                    writeLines(lines);
                     return;
                 }
             }

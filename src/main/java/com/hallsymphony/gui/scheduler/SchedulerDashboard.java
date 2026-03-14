@@ -129,7 +129,7 @@ public class SchedulerDashboard extends JFrame {
         }
         String hallId = (String) hallModel.getValueAt(row, 0);
         String status = JOptionPane.showInputDialog(this, "New status (AVAILABLE/UNAVAILABLE):", "Update Status", JOptionPane.PLAIN_MESSAGE);
-        if (status == null || status.isBlank()) {
+        if (status == null || status.trim().isEmpty()) {
             return;
         }
         List<Hall> halls = hallService.getAllHalls();

@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -30,15 +31,23 @@ public class PaymentService {
                 Files.createDirectories(PAYMENT_FILE.getParent());
             }
             if (Files.notExists(PAYMENT_FILE)) {
-                Files.write(PAYMENT_FILE, List.of("# Payment data file"));
+                Files.write(PAYMENT_FILE, Collections.singletonList("# Payment data file"));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private List<String> readLines() throws IOException {
+        return FileHandler.readFromFile(PAYMENT_FILE);
+    }
+
+    private void writeLines(List<String> lines) throws IOException {
+        FileHandler.writeToFile(PAYMENT_FILE, lines);
+    }
+
     private Optional<Payment> parsePayment(String line) {
-        if (line == null || line.isBlank() || line.startsWith("#")) {
+        if (line == null || line.trim().isEmpty() || line.startsWith("#")) {
             return Optional.empty();
         }
         String[] parts = line.split("\\|");
@@ -68,9 +77,9 @@ public class PaymentService {
         }
         payment.processPayment();
         try {
-            List<String> lines = FileHandler.readFromFile(PAYMENT_FILE);
+            List<String> lines = readLines();
             lines.add(paymentToLine(payment));
-            FileHandler.writeToFile(PAYMENT_FILE, lines);
+            writeLines(lines);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,7 +94,7 @@ public class PaymentService {
     public List<Payment> getAllPayments() {
         List<Payment> payments = new ArrayList<>();
         try {
-            List<String> lines = FileHandler.readFromFile(PAYMENT_FILE);
+            List<String> lines = readLines();
             for (String line : lines) {
                 parsePayment(line).ifPresent(payments::add);
             }
@@ -98,7 +107,7 @@ public class PaymentService {
     public List<Payment> getPaymentsForBooking(String bookingId) {
         List<Payment> payments = new ArrayList<>();
         try {
-            List<String> lines = FileHandler.readFromFile(PAYMENT_FILE);
+            List<String> lines = readLines();
             for (String line : lines) {
                 Optional<Payment> opt = parsePayment(line);
                 if (opt.isPresent() && opt.get().getBookingId().equals(bookingId)) {

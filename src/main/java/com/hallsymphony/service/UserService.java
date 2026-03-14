@@ -6,7 +6,6 @@ import com.hallsymphony.model.user.Manager;
 import com.hallsymphony.model.user.Scheduler;
 import com.hallsymphony.model.user.User;
 import com.hallsymphony.util.FileHandler;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class UserService {
-    private static final Path USER_FILE = Paths.get("data", "users.txt");
+    private static final Path USER_FILE = Paths.get(System.getProperty("user.dir"), "data", "users.txt");
 
     public UserService() {
         ensureDataFiles();

@@ -13,6 +13,7 @@ import com.hallsymphony.util.IdGenerator;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class PaymentFrame extends JFrame {
     private final Booking booking;
@@ -124,16 +125,23 @@ public class PaymentFrame extends JFrame {
 
     private void processPayment() {
         try {
-            String paymentId = IdGenerator.generatePaymentId();
-            Payment payment = new Payment(
-                    paymentId,
-                    booking.getBookingId(),
-                    booking.getTotalAmount(),
-                    LocalDate.now(),
-                    "COMPLETED"
-            );
-
-            paymentService.addPayment(payment);
+            Optional<Payment> existingPayment = paymentService.getPaymentByBookingId(booking.getBookingId());
+            Payment payment;
+            if (existingPayment.isPresent()) {
+                paymentService.updatePaymentStatus(existingPayment.get().getPaymentId(), "COMPLETED");
+                payment = existingPayment.get();
+            } else {
+                // Fallback, but should not happen
+                String paymentId = IdGenerator.generatePaymentId();
+                payment = new Payment(
+                        paymentId,
+                        booking.getBookingId(),
+                        booking.getTotalAmount(),
+                        LocalDate.now(),
+                        "COMPLETED"
+                );
+                paymentService.addPayment(payment);
+            }
 
             Booking confirmedBooking = new Booking(
                     booking.getBookingId(),

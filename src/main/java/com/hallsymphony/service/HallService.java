@@ -5,7 +5,6 @@ import com.hallsymphony.model.hall.BanquetHall;
 import com.hallsymphony.model.hall.Hall;
 import com.hallsymphony.model.hall.MeetingRoom;
 import com.hallsymphony.util.FileHandler;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class HallService {
-    private static final Path HALL_FILE = Paths.get("data", "halls.txt");
+    private static final Path HALL_FILE = Paths.get(System.getProperty("user.dir"), "data", "halls.txt");
 
     public HallService() {
         ensureDataFiles();

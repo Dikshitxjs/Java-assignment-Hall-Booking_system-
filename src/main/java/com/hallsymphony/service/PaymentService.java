@@ -1,10 +1,8 @@
 package com.hallsymphony.service;
 
-import com.hallsymphony.model.booking.Booking;
 import com.hallsymphony.model.payment.Payment;
 import com.hallsymphony.model.payment.Receipt;
 import com.hallsymphony.util.FileHandler;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,7 +17,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class PaymentService {
-    private static final Path PAYMENT_FILE = Paths.get("data", "payments.txt");
+    private static final Path PAYMENT_FILE = Paths.get(System.getProperty("user.dir"), "data", "payments.txt");
 
     public PaymentService() {
         ensureDataFiles();
@@ -34,7 +32,7 @@ public class PaymentService {
                 Files.write(PAYMENT_FILE, Collections.singletonList("# Payment data file"));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error ensuring payment data files: " + e.getMessage());
         }
     }
 
@@ -82,7 +80,7 @@ public class PaymentService {
             writeLines(lines);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error processing payment: " + e.getMessage());
             return false;
         }
     }
@@ -99,7 +97,7 @@ public class PaymentService {
                 parsePayment(line).ifPresent(payments::add);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error reading all payments: " + e.getMessage());
         }
         return payments;
     }
@@ -115,9 +113,24 @@ public class PaymentService {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error reading payments for booking: " + e.getMessage());
         }
         return payments;
+    }
+
+    public Optional<Payment> getPaymentByBookingId(String bookingId) {
+        try {
+            List<String> lines = readLines();
+            for (String line : lines) {
+                Optional<Payment> opt = parsePayment(line);
+                if (opt.isPresent() && opt.get().getBookingId().equals(bookingId)) {
+                    return opt;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
     }
 
     public void addPayment(Payment payment) {
@@ -125,6 +138,24 @@ public class PaymentService {
             List<String> lines = FileHandler.readFromFile(PAYMENT_FILE);
             lines.add(paymentToLine(payment));
             FileHandler.writeToFile(PAYMENT_FILE, lines);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updatePaymentStatus(String paymentId, String status) {
+        try {
+            List<String> lines = FileHandler.readFromFile(PAYMENT_FILE);
+            for (int i = 0; i < lines.size(); i++) {
+                Optional<Payment> opt = parsePayment(lines.get(i));
+                if (opt.isPresent() && opt.get().getPaymentId().equals(paymentId)) {
+                    Payment payment = opt.get();
+                    payment.setPaymentStatus(status);
+                    lines.set(i, paymentToLine(payment));
+                    FileHandler.writeToFile(PAYMENT_FILE, lines);
+                    return;
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -37,4 +37,5 @@ public class Payment {
     public double getAmount() { return amount; }
     public LocalDate getPaymentDate() { return paymentDate; }
     public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
 }

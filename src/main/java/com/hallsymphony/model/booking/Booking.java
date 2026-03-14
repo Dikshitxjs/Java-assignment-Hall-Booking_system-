@@ -3,14 +3,28 @@ package com.hallsymphony.model.booking;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+/**
+ * Represents a single hall booking.
+ * <p>
+ * This is a mostly immutable model; only the booking status can change after creation.
+ * </p>
+ */
 public class Booking {
-    private String bookingId;
-    private String customerId;
-    private String hallId;
-    private LocalDate bookingDate;
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private double totalAmount;
+    /** Unique booking identifier */
+    private final String bookingId;
+    /** User who made the booking */
+    private final String customerId;
+    /** Hall that was booked */
+    private final String hallId;
+    /** Date of the booking */
+    private final LocalDate bookingDate;
+    /** Booking start time */
+    private final LocalTime startTime;
+    /** Booking end time */
+    private final LocalTime endTime;
+    /** Total amount charged for the booking */
+    private final double totalAmount;
+    /** Current booking status (pending/confirmed/cancelled) */
     private BookingStatus bookingStatus;
 
     public Booking(String bookingId, String customerId, String hallId,

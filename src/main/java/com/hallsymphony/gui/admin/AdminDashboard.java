@@ -78,7 +78,7 @@ public class AdminDashboard extends JFrame {
             return;
         }
         String userId = (String) userModel.getValueAt(idx, 0);
-        if (userId == null || userId.isBlank()) {
+        if (userId == null || userId.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Invalid user selection.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }

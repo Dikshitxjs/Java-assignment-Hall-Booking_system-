@@ -3,7 +3,6 @@ package com.hallsymphony.service;
 import com.hallsymphony.model.issue.Issue;
 import com.hallsymphony.model.issue.IssueStatus;
 import com.hallsymphony.util.FileHandler;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class IssueService {
-    private static final Path ISSUE_FILE = Paths.get("data", "issues.txt");
+    private static final Path ISSUE_FILE = Paths.get(System.getProperty("user.dir"), "data", "issues.txt");
 
     public IssueService() {
         ensureDataFiles();

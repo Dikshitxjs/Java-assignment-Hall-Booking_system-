@@ -3,11 +3,13 @@ package com.hallsymphony.gui.customer;
 import com.hallsymphony.model.booking.Booking;
 import com.hallsymphony.model.booking.BookingStatus;
 import com.hallsymphony.model.hall.Hall;
+import com.hallsymphony.model.payment.Payment;
 import com.hallsymphony.model.user.Customer;
 import com.hallsymphony.service.BookingService;
 import com.hallsymphony.service.HallService;
 import com.hallsymphony.service.IssueService;
 import com.hallsymphony.service.PaymentService;
+import com.hallsymphony.util.IdGenerator;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -249,6 +251,11 @@ public class CustomerDashboard extends JFrame {
             JOptionPane.showMessageDialog(this, "Hall is already booked for that slot.", "Conflict", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
+        // Save payment record
+        String paymentId = IdGenerator.generatePaymentId();
+        Payment payment = new Payment(paymentId, booking.getBookingId(), amount, LocalDate.now(), "PENDING");
+        paymentService.addPayment(payment);
 
         JOptionPane.showMessageDialog(this, "Booking created. Total: RM " + amount, "Success", JOptionPane.INFORMATION_MESSAGE);
         refreshBookings();

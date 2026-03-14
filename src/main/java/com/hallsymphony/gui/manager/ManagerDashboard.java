@@ -2,17 +2,15 @@ package com.hallsymphony.gui.manager;
 
 import com.hallsymphony.model.issue.Issue;
 import com.hallsymphony.model.issue.IssueStatus;
-import com.hallsymphony.model.user.Manager;
 import com.hallsymphony.model.payment.Payment;
+import com.hallsymphony.model.user.Manager;
 import com.hallsymphony.service.BookingService;
 import com.hallsymphony.service.IssueService;
 import com.hallsymphony.service.PaymentService;
-
+import java.awt.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.List;
 
 public class ManagerDashboard extends JFrame {
     private final Manager manager;
@@ -21,6 +19,7 @@ public class ManagerDashboard extends JFrame {
     private final IssueService issueService;
 
     private final DefaultTableModel issueModel;
+    private final DefaultTableModel paymentModel;
 
     public ManagerDashboard(Manager manager, BookingService bookingService, PaymentService paymentService, IssueService issueService) {
         super("Manager Dashboard - " + manager.getFullName());
@@ -58,6 +57,20 @@ public class ManagerDashboard extends JFrame {
         salesPanel.add(refreshSales, BorderLayout.SOUTH);
         tabs.addTab("Sales", salesPanel);
 
+        // Payments tab
+        paymentModel = new DefaultTableModel(new String[]{"Payment ID", "Booking ID", "Amount", "Date", "Status"}, 0);
+        JTable paymentTable = new JTable(paymentModel);
+        JScrollPane paymentScroll = new JScrollPane(paymentTable);
+        JButton refreshPayments = new JButton("Refresh");
+        refreshPayments.addActionListener(e -> refreshPayments());
+
+        JPanel paymentsPanel = new JPanel(new BorderLayout());
+        JPanel paymentButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        paymentButtons.add(refreshPayments);
+        paymentsPanel.add(paymentScroll, BorderLayout.CENTER);
+        paymentsPanel.add(paymentButtons, BorderLayout.SOUTH);
+        tabs.addTab("Payments", paymentsPanel);
+
         // Issues tab
         issueModel = new DefaultTableModel(new String[]{"Issue ID", "Booking ID", "Description", "Status", "Assigned To"}, 0);
         JTable issueTable = new JTable(issueModel);
@@ -85,6 +98,7 @@ public class ManagerDashboard extends JFrame {
         add(logout, BorderLayout.SOUTH);
 
         refreshSalesAmount(salesLabel);
+        refreshPayments();
         refreshIssues();
     }
 
@@ -106,6 +120,14 @@ public class ManagerDashboard extends JFrame {
             total = paymentService.getTotalSalesAllTime();
         }
         label.setText(String.format("Total Sales (%s): RM %.2f", period, total));
+    }
+
+    private void refreshPayments() {
+        List<Payment> payments = paymentService.getAllPayments();
+        paymentModel.setRowCount(0);
+        for (Payment p : payments) {
+            paymentModel.addRow(new Object[]{p.getPaymentId(), p.getBookingId(), String.format("%.2f", p.getAmount()), p.getPaymentDate(), p.getPaymentStatus()});
+        }
     }
 
     private void refreshIssues() {

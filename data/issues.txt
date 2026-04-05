@@ -1,1 +1,2 @@
 # Issue data file
+I-a6d05baf-75d5-4ac8-beb0-0b9fce27c07d|H-AUD-1|unmanaged chairs|2026-03-14|IN_PROGRESS

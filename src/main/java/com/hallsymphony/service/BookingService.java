@@ -3,7 +3,6 @@ package com.hallsymphony.service;
 import com.hallsymphony.model.booking.Booking;
 import com.hallsymphony.model.booking.BookingStatus;
 import com.hallsymphony.util.FileHandler;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class BookingService {
-    private static final Path BOOKING_FILE = Paths.get("data", "bookings.txt");
+    private static final Path BOOKING_FILE = Paths.get(System.getProperty("user.dir"), "data", "bookings.txt");
 
     public BookingService() {
         ensureDataFiles();
